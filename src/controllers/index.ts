@@ -1,1 +1,1 @@
-export { default as programController } from "./programController";
+export * from "./programController";

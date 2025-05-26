@@ -1,1 +1,1 @@
-export { default as programRoutes } from './programRoutes';
+export { default as programRoutes } from "./program";

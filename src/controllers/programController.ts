@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import Program from '../models/Program';
+import { Request, Response } from "express";
+import { Program } from "../models";
 
 // ایجاد برنامه جدید
 export const createProgram = async (req: Request, res: Response) => {
@@ -7,7 +7,7 @@ export const createProgram = async (req: Request, res: Response) => {
     const { userId, userName, programName, exercises } = req.body;
 
     if (!userId || !userName || !programName || !exercises) {
-      return res.status(400).json({ message: 'All fields are required' });
+      return res.status(400).json({ message: "All fields are required" });
     }
 
     const newProgram = new Program({
@@ -18,9 +18,9 @@ export const createProgram = async (req: Request, res: Response) => {
     });
 
     await newProgram.save();
-    res.status(201).json({ message: 'Program created', program: newProgram });
+    res.status(201).json({ message: "Program created", program: newProgram });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: "Server error", error });
   }
 };
 
@@ -31,11 +31,13 @@ export const getProgramByUserId = async (req: Request, res: Response) => {
     const programs = await Program.find({ userId });
 
     if (!programs || programs.length === 0) {
-      return res.status(404).json({ message: 'No programs found for this user' });
+      return res
+        .status(404)
+        .json({ message: "No programs found for this user" });
     }
 
     res.status(200).json(programs);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: "Server error", error });
   }
 };
