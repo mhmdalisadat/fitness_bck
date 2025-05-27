@@ -20,7 +20,22 @@ app.use(
 // Middleware برای پارس JSON
 app.use(express.json());
 
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
 // روت‌ها
 app.use("/api", programRoutes);
+
+// 404 handler
+app.use((req, res) => {
+  console.log("404 Not Found:", req.method, req.url);
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
 
 export default app;

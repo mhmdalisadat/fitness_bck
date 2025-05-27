@@ -22,7 +22,7 @@ const SetConfigSchema = new Schema({
       "powerbuilding",
       "mindMuscle",
     ],
-    required: true,
+    default: "straight",
   },
   typeName: {
     straight: { type: String, default: "ست معمولی" },
@@ -42,46 +42,52 @@ const SetConfigSchema = new Schema({
     powerbuilding: { type: String, default: "پاوربیلدینگ" },
     mindMuscle: { type: String, default: "تمرکز ذهن-عضله" },
   },
-  targetSets: { type: Number, required: true },
-  targetReps: { type: Number, required: true },
-  restTime: { type: Number, required: true },
+  targetSets: { type: Number, default: 3 },
+  targetReps: { type: Number, default: 10 },
+  restTime: { type: Number, default: 90 },
 });
 
 // Related Exercise Schema
 const RelatedExerciseSchema = new Schema({
   id: { type: String, required: true },
   name: { type: String, required: true },
-  reps: { type: String, required: true },
-  sets: { type: String, required: true },
-  restTime: { type: Number, required: true },
+  reps: { type: String, default: "" },
+  sets: { type: String, default: "" },
+  restTime: { type: Number, default: 90 },
 });
 
 // Exercise Schema
 const ExerciseSchema = new Schema({
   id: { type: String, required: true },
   name: { type: String, required: true },
-  description: { type: String, required: true },
+  description: { type: String, default: "" },
   muscleGroup: { type: String, required: true },
-  isCompound: { type: Boolean, required: true },
-  isIsolation: { type: Boolean, required: true },
-  reps: { type: String, required: true },
-  sets: { type: String, required: true },
-  setType: { type: String, required: true },
-  setConfig: { type: SetConfigSchema, required: true },
-  relatedExercises: [RelatedExerciseSchema],
+  isCompound: { type: Boolean, default: false },
+  isIsolation: { type: Boolean, default: false },
+  reps: { type: String, default: "" },
+  sets: { type: String, default: "" },
+  setType: { type: String, default: "straight" },
+  setConfig: { type: SetConfigSchema, default: () => ({}) },
+  relatedExercises: { type: [RelatedExerciseSchema], default: [] },
 });
 
 // Day Schema
 const DaySchema = new Schema({
   day: { type: Number, required: true },
-  id: { type: String, required: true },
-  targetMuscles: [{ type: String, required: true }],
-  exercises: [ExerciseSchema],
+  id: { type: String, default: () => Math.random().toString(36).substr(2, 9) },
+  targetMuscles: { type: [String], default: [] },
+  exercises: { type: [ExerciseSchema], default: [] },
 });
 
 // Program Schema
 const ProgramSchema = new Schema(
   {
+    programId: {
+      type: String,
+      required: true,
+      unique: true,
+      default: () => Math.floor(1000 + Math.random() * 9000).toString(),
+    },
     programName: { type: String, required: true },
     daysPerWeek: { type: String, required: true },
     description: { type: String, required: true },
@@ -95,11 +101,11 @@ const ProgramSchema = new Schema(
     },
     trainingSystem: {
       type: String,
-      enum: ["fullbody", "split", "push-pull", "upper-lower"],
+      enum: ["fullbody", "split", "push-pull", "upper-lower", "custom"],
       required: true,
     },
     userImage: { type: String, default: "" },
-    days: [DaySchema],
+    days: { type: [DaySchema], default: [] },
   },
   {
     timestamps: true,
@@ -107,6 +113,7 @@ const ProgramSchema = new Schema(
 );
 
 export interface IProgram extends Document {
+  programId: string;
   programName: string;
   daysPerWeek: string;
   description: string;
@@ -114,7 +121,7 @@ export interface IProgram extends Document {
   height: string;
   weight: string;
   purpose: "muscle-gain" | "weight-loss" | "strength" | "endurance";
-  trainingSystem: "fullbody" | "split" | "push-pull" | "upper-lower";
+  trainingSystem: "fullbody" | "split" | "push-pull" | "upper-lower" | "custom";
   userImage: string;
   days: Array<{
     day: number;

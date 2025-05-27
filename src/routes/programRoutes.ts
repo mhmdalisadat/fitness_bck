@@ -12,6 +12,7 @@ interface ProgramParams {
 const createProgram: RequestHandler = async (req, res) => {
   try {
     const programData = req.body;
+    console.log("Received data:", programData); // Debug log
 
     // Create new program document
     const program = new Program(programData);
@@ -67,7 +68,10 @@ const getProgram: RequestHandler<ProgramParams> = async (req, res) => {
   }
 };
 
-router.post("/", createProgram);
-router.get("/:username/:id", getProgram);
+// Handle both with and without trailing slash
+router.post("/programs", createProgram);
+router.post("/programs/", createProgram);
+router.get("/programs/:username/:id", getProgram);
+router.get("/programs/:username/:id/", getProgram);
 
 export default router;
