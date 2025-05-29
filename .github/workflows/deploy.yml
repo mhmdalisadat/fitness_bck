@@ -4,7 +4,6 @@ on:
   push:
     branches: ["main"]
 
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -12,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: SSH and Deploy
+      - name: SSH and Deploy Frontend
         uses: appleboy/ssh-action@master
         with:
           host: ${{secrets.SERVER_HOST}}
@@ -20,28 +19,19 @@ jobs:
           key: ${{secrets.SSH_PRIVATE_KEY}}
           port: ${{secrets.SSH_PORT}}
           script: |
-            echo "Starting backend deployment..."
+            echo "Starting frontend deployment..."
 
-            # رفتن به دایرکتوری اصلی
-            cd /var/www/fit
-
-            echo "Stopping existing backend and mongo containers..."
-            docker-compose stop backend mongo || true
-
-            echo "Updating backend..."
-            cd bck
+            # Navigate to project directory
+            cd /var/www/fit/bck
             git reset --hard HEAD
             git clean -fd
             git pull origin main || { echo "Git pull failed"; exit 1; }
-            cd ..
 
-            echo "Building and starting new containers..."
-            docker-compose up -d --build backend mongo || { echo "Docker compose failed"; exit 1; }
+            echo "Building and updating backend container..."
+            docker-compose build backend
+            docker-compose up -d --no-deps backend
 
-            echo "Checking container status..."
-            docker-compose ps backend mongo
-
-            echo "Checking container logs..."
-            docker-compose logs --tail=50 backend mongo
+            echo "Checking backend container status..."
+            docker-compose ps backend
 
             echo "Backend deployment completed successfully"
