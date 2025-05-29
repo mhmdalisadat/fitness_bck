@@ -3,8 +3,7 @@ name: Deploy Backend to Ubuntu Server
 on:
   push:
     branches: ["main"]
-    paths:
-      - "bck/**" # فقط تغییرات در پوشه بک‌اند
+
 
 jobs:
   deploy:
