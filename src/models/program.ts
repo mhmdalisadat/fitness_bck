@@ -112,6 +112,9 @@ const ProgramSchema = new Schema(
   }
 );
 
+// Add compound unique index for name and programName
+ProgramSchema.index({ name: 1, programName: 1 }, { unique: true });
+
 export interface IProgram extends Document {
   programId: string;
   programName: string;

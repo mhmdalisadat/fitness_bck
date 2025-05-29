@@ -12,12 +12,22 @@ interface ProgramParams {
 const createProgram: RequestHandler = async (req, res) => {
   try {
     const programData = req.body;
-    console.log("Received data:", programData); // Debug log
+    console.log("Received data:", programData);
 
-    // Create new program document
+    const existingProgram = await Program.findOne({
+      name: programData.name,
+      programName: programData.programName,
+    });
+
+    if (existingProgram) {
+      res.status(400).json({
+        success: false,
+        message: "برنامه با این نام و نام کاربری قبلاً ثبت شده است",
+      });
+      return;
+    }
+
     const program = new Program(programData);
-
-    // Save to database
     const savedProgram = await program.save();
 
     res.status(201).json({
@@ -25,8 +35,17 @@ const createProgram: RequestHandler = async (req, res) => {
       message: "برنامه با موفقیت ذخیره شد",
       data: savedProgram,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error saving program:", error);
+
+    if (error.code === 11000) {
+      res.status(400).json({
+        success: false,
+        message: "برنامه با این نام و نام کاربری قبلاً ثبت شده است",
+      });
+      return;
+    }
+
     res.status(500).json({
       success: false,
       message: "خطا در ذخیره برنامه",
@@ -68,10 +87,38 @@ const getProgram: RequestHandler<ProgramParams> = async (req, res) => {
   }
 };
 
+// DELETE /programs/clear - Clear all programs (development only)
+const clearDatabase: RequestHandler = async (req, res) => {
+  if (process.env.NODE_ENV !== "development") {
+    res.status(403).json({
+      success: false,
+      message: "این عملیات فقط در محیط توسعه مجاز است",
+    });
+    return;
+  }
+
+  try {
+    await Program.deleteMany({});
+    res.status(200).json({
+      success: true,
+      message: "تمام برنامه‌ها با موفقیت حذف شدند",
+    });
+  } catch (error: any) {
+    console.error("Error clearing database:", error);
+    res.status(500).json({
+      success: false,
+      message: "خطا در پاک کردن دیتابیس",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
 // Handle both with and without trailing slash
 router.post("/programs", createProgram);
 router.post("/programs/", createProgram);
 router.get("/programs/:username/:id", getProgram);
 router.get("/programs/:username/:id/", getProgram);
+router.delete("/programs/clear", clearDatabase);
+router.delete("/programs/clear/", clearDatabase);
 
 export default router;
