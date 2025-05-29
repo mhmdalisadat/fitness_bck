@@ -1,0 +1,48 @@
+name: Deploy Backend to Ubuntu Server
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "bck/**" # فقط تغییرات در پوشه بک‌اند
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: SSH and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{secrets.SERVER_HOST}}
+          username: ${{secrets.SERVER_USER}}
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          port: ${{secrets.SSH_PORT}}
+          script: |
+            echo "Starting backend deployment..."
+
+            # رفتن به دایرکتوری اصلی
+            cd /var/www/fit
+
+            echo "Stopping existing backend and mongo containers..."
+            docker-compose stop backend mongo || true
+
+            echo "Updating backend..."
+            cd bck
+            git reset --hard HEAD
+            git clean -fd
+            git pull origin main || { echo "Git pull failed"; exit 1; }
+            cd ..
+
+            echo "Building and starting new containers..."
+            docker-compose up -d --build backend mongo || { echo "Docker compose failed"; exit 1; }
+
+            echo "Checking container status..."
+            docker-compose ps backend mongo
+
+            echo "Checking container logs..."
+            docker-compose logs --tail=50 backend mongo
+
+            echo "Backend deployment completed successfully"
