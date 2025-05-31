@@ -1,13 +1,12 @@
 import express, { Express } from "express";
 import { programRoutes } from "./routes";
+import { workoutRoutes, userRoutes } from "./routes";
 import cors from "cors";
 import dotenv from "dotenv";
-
 
 dotenv.config();
 
 const app: Express = express();
-
 
 app.use(
   cors({
@@ -26,8 +25,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// روت‌ها
+// Routes
 app.use("/api", programRoutes);
+app.use("/api", workoutRoutes);
+app.use("/api", userRoutes);
 
 // 404 handler
 app.use((req, res) => {
