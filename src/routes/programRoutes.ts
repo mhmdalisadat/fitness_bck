@@ -1,5 +1,5 @@
-import { Router, Request, Response, RequestHandler } from "express";
-import { Program, IProgram } from "../models/program";
+import { Router, RequestHandler } from "express";
+import { Program } from "../models/program";
 
 const router = Router();
 
@@ -61,7 +61,7 @@ const getProgram: RequestHandler<ProgramParams> = async (req, res) => {
 
     const program = await Program.findOne({
       programName: username,
-      _id: id,
+      programId: id,
     });
 
     if (!program) {
@@ -113,7 +113,6 @@ const clearDatabase: RequestHandler = async (req, res) => {
   }
 };
 
-// Handle both with and without trailing slash
 router.post("/programs", createProgram);
 router.post("/programs/", createProgram);
 router.get("/programs/:username/:id", getProgram);

@@ -3,12 +3,12 @@ import { programRoutes } from "./routes";
 import cors from "cors";
 import dotenv from "dotenv";
 
-// Load environment variables
+
 dotenv.config();
 
 const app: Express = express();
 
-// CORS configuration
+
 app.use(
   cors({
     origin: ["http://31.40.4.92:7074", "http://localhost:5173"],
@@ -18,7 +18,6 @@ app.use(
   })
 );
 
-// Middleware برای پارس JSON
 app.use(express.json());
 
 // Debug middleware to log all requests
