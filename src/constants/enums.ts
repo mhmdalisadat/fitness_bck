@@ -72,3 +72,27 @@ export const TRAINING_TIMES = [
   "evening",
   "night",
 ] as const;
+
+export const TRAINING_EXPERIENCE_LEVELS = [
+  "beginner",
+  "intermediate",
+  "advanced",
+] as const;
+
+export const MEDICAL_CONDITIONS = [
+  "heart_disease",
+  "diabetes",
+  "hypertension",
+  "asthma",
+  "arthritis",
+  "none",
+] as const;
+
+export const INJURIES = [
+  "knee",
+  "shoulder",
+  "back",
+  "wrist",
+  "ankle",
+  "none",
+] as const;

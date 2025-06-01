@@ -17,9 +17,6 @@ export const createUser: RequestHandler<any, any, any, any> = async (
       trainingGoals,
       medicalConditions,
       injuries,
-      preferredTrainingDays,
-      preferredTrainingTime,
-      profileImage,
     } = req.body;
 
     if (
@@ -66,9 +63,6 @@ export const createUser: RequestHandler<any, any, any, any> = async (
       trainingGoals: trainingGoals || [],
       medicalConditions: medicalConditions || [],
       injuries: injuries || [],
-      preferredTrainingDays: preferredTrainingDays || [],
-      preferredTrainingTime: preferredTrainingTime || "morning",
-      profileImage: profileImage || "",
       isActive: true,
     });
 
@@ -89,8 +83,6 @@ export const createUser: RequestHandler<any, any, any, any> = async (
           trainingGoals: savedUser.trainingGoals,
           medicalConditions: savedUser.medicalConditions,
           injuries: savedUser.injuries,
-          preferredTrainingDays: savedUser.preferredTrainingDays,
-          preferredTrainingTime: savedUser.preferredTrainingTime,
           bmi: (savedUser.weight / Math.pow(savedUser.height / 100, 2)).toFixed(
             1
           ),
@@ -157,8 +149,6 @@ export const getUserInfo: RequestHandler<any, any, any, any> = async (
           trainingGoals: user.trainingGoals,
           medicalConditions: user.medicalConditions,
           injuries: user.injuries,
-          preferredTrainingDays: user.preferredTrainingDays,
-          preferredTrainingTime: user.preferredTrainingTime,
           bmi: (user.weight / Math.pow(user.height / 100, 2)).toFixed(1),
         },
         workouts,
