@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { Workout, User, Day, Movement } from "../models";
+import { IUser } from "../models/user";
 import mongoose from "mongoose";
 import { TRAINING_EXPERIENCE_LEVELS, MUSCLE_GROUPS } from "../constants/enums";
 
@@ -11,6 +12,7 @@ interface IWorkoutData {
   workout_weeks: number;
   user?: IUserData;
   days?: IDayData[];
+  [key: string]: any; // اضافه کردن index signature
 }
 
 interface IUserData {
@@ -23,6 +25,7 @@ interface IUserData {
   trainingGoals: string[];
   medicalConditions: string[];
   injuries: string[];
+  [key: string]: any; // اضافه کردن index signature
 }
 
 interface IDayData {
@@ -82,6 +85,28 @@ const validateWorkoutData = (data: IWorkoutData): string | null => {
   return null;
 };
 
+// اعتبارسنجی داده‌های روز
+const validateDayData = (dayData: IDayData): string | null => {
+  if (!dayData.day_number || dayData.day_number < 1 || dayData.day_number > 7) {
+    return "شماره روز باید بین ۱ تا ۷ باشد";
+  }
+
+  if (!dayData.day_muscle_groups?.length) {
+    return "حداقل یک گروه عضلانی برای روز الزامی است";
+  }
+
+  // بررسی معتبر بودن گروه‌های عضلانی
+  const invalidMuscleGroups = dayData.day_muscle_groups.filter(
+    (group) => !MUSCLE_GROUPS.includes(group)
+  );
+
+  if (invalidMuscleGroups.length > 0) {
+    return `گروه‌های عضلانی نامعتبر: ${invalidMuscleGroups.join(", ")}`;
+  }
+
+  return null;
+};
+
 export const handleWorkout = async (
   req: Request,
   res: Response
@@ -89,6 +114,7 @@ export const handleWorkout = async (
   try {
     const { workoutId } = req.params;
     const data = parseNumericFields(req.body) as IWorkoutData;
+    const isPatchRequest = req.method === "PATCH";
 
     // اگر workoutId وجود داشت، یعنی در حال آپدیت هستیم
     if (workoutId) {
@@ -119,7 +145,17 @@ export const handleWorkout = async (
         if (!existingUser) {
           existingUser = new User(data.user);
         } else {
-          Object.assign(existingUser, data.user);
+          // در PATCH فقط فیلدهای ارسال شده آپدیت می‌شوند
+          if (isPatchRequest) {
+            Object.keys(data.user || {}).forEach((key) => {
+              if (data.user?.[key] !== undefined) {
+                (existingUser as any)[key] =
+                  data.user?.[key as keyof IUserData];
+              }
+            });
+          } else {
+            Object.assign(existingUser, data.user);
+          }
         }
 
         await existingUser.save();
@@ -136,22 +172,82 @@ export const handleWorkout = async (
       }
 
       // اعتبارسنجی داده‌های workout
-      const validationError = validateWorkoutData(data);
-      if (validationError) {
-        res.status(400).json({
-          success: false,
-          message: validationError,
-        });
-        return;
+      if (!isPatchRequest) {
+        const validationError = validateWorkoutData(data);
+        if (validationError) {
+          res.status(400).json({
+            success: false,
+            message: validationError,
+          });
+          return;
+        }
       }
 
       // آپدیت اطلاعات برنامه
-      Object.assign(workout, {
-        workout_name: data.workout_name,
-        workout_description: data.workout_description,
-        workout_days_per_week: data.workout_days_per_week,
-        workout_weeks: data.workout_weeks,
-      });
+      if (isPatchRequest) {
+        // در PATCH فقط فیلدهای ارسال شده آپدیت می‌شوند
+        Object.keys(data).forEach((key) => {
+          if (key !== "user" && key !== "days" && data[key] !== undefined) {
+            (workout as any)[key] = data[key as keyof IWorkoutData];
+          }
+        });
+
+        // آپدیت روزها اگر ارسال شده باشند
+        if (data.days?.length) {
+          // اعتبارسنجی روزها
+          for (const dayData of data.days) {
+            const validationError = validateDayData(dayData);
+            if (validationError) {
+              res.status(400).json({
+                success: false,
+                message: `خطا در اعتبارسنجی روز ${dayData.day_number}: ${validationError}`,
+              });
+              return;
+            }
+          }
+
+          // بررسی تکراری نبودن شماره روزها
+          const dayNumbers = data.days.map((day) => day.day_number);
+          const uniqueDayNumbers = new Set(dayNumbers);
+          if (dayNumbers.length !== uniqueDayNumbers.size) {
+            res.status(400).json({
+              success: false,
+              message: "شماره روزها نباید تکراری باشند",
+            });
+            return;
+          }
+
+          // حذف روزهای قبلی
+          await Day.deleteMany({ day_workout_id: workout._id });
+
+          // ایجاد روزهای جدید
+          const savedDays = await Promise.all(
+            data.days.map(async (dayData) => {
+              const day = new Day({
+                day_number: dayData.day_number,
+                day_muscle_groups: dayData.day_muscle_groups,
+                day_workout_id: workout._id,
+                day_movements: [],
+                day_is_active: true,
+              });
+              return await day.save();
+            })
+          );
+
+          // آپدیت آرایه روزها در workout
+          workout.days = savedDays.map(
+            (day) => day._id as mongoose.Types.ObjectId
+          );
+        }
+      } else {
+        // در PUT همه فیلدها آپدیت می‌شوند
+        Object.assign(workout, {
+          workout_name: data.workout_name,
+          workout_description: data.workout_description,
+          workout_days_per_week: data.workout_days_per_week,
+          workout_weeks: data.workout_weeks,
+        });
+      }
       await workout.save();
 
       // پیدا کردن اطلاعات کاربر
@@ -159,11 +255,22 @@ export const handleWorkout = async (
         ? await User.findOne({ phoneNumber: data.user.phoneNumber })
         : null;
 
+      // دریافت برنامه با اطلاعات آپدیت شده
+      const updatedWorkout = await Workout.findOne({
+        workout_id: workoutId,
+      }).populate({
+        path: "days",
+        populate: {
+          path: "day_movements",
+          model: "Movement",
+        },
+      });
+
       res.status(200).json({
         success: true,
         message: "برنامه تمرینی با موفقیت آپدیت شد",
         data: {
-          ...workout.toObject(),
+          ...updatedWorkout?.toObject(),
           user: user || null,
         },
       });
@@ -200,14 +307,23 @@ export const handleWorkout = async (
     }
 
     // ایجاد یا آپدیت کاربر
-    let existingUser = null;
+    let existingUser: IUser | null = null;
     if (data.user) {
       existingUser = await User.findOne({ phoneNumber: data.user.phoneNumber });
 
       if (!existingUser) {
         existingUser = new User(data.user);
       } else {
-        Object.assign(existingUser, data.user);
+        // در PATCH فقط فیلدهای ارسال شده آپدیت می‌شوند
+        if (isPatchRequest) {
+          Object.keys(data.user || {}).forEach((key) => {
+            if (data.user?.[key] !== undefined) {
+              (existingUser as any)[key] = data.user?.[key as keyof IUserData];
+            }
+          });
+        } else {
+          Object.assign(existingUser, data.user);
+        }
       }
 
       await existingUser.save();
@@ -239,12 +355,19 @@ export const handleWorkout = async (
 
         if (dayData.movements?.length) {
           const savedMovements = await Promise.all(
-            dayData.movements.map(async (movementData) => {
+            dayData.movements.map(async (movementData, index) => {
               const movement = new Movement({
                 ...parseMovementFields(movementData),
                 movement_workout_id: savedWorkout._id,
                 movement_day_id: savedDay._id,
                 movement_is_active: true,
+                movement_order: index + 1, // اضافه کردن ترتیب حرکت
+                movement_set_config: {
+                  sets: movementData.movement_sets,
+                  reps: movementData.movement_reps,
+                  rest_time: movementData.movement_rest_time,
+                  rest_time_unit: "seconds",
+                },
               });
               return await movement.save();
             })
@@ -258,7 +381,6 @@ export const handleWorkout = async (
       }
     }
 
-    // دریافت برنامه با روزها و حرکات
     const populatedWorkout = await Workout.findById(savedWorkout._id).populate({
       path: "days",
       populate: {
@@ -280,6 +402,104 @@ export const handleWorkout = async (
     res.status(500).json({
       success: false,
       message: "خطا در پردازش درخواست",
+      error: error instanceof Error ? error.message : "خطای ناشناخته",
+    });
+  }
+};
+
+// اضافه کردن حرکت به برنامه
+export const handleAddMovement = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { workoutId } = req.params;
+    const { day_number, movement } = req.body;
+
+    if (!day_number || !movement) {
+      res.status(400).json({
+        success: false,
+        message: "شماره روز و اطلاعات حرکت الزامی است",
+      });
+      return;
+    }
+
+    // پیدا کردن برنامه
+    const workout = await Workout.findOne({ workout_id: workoutId });
+    if (!workout) {
+      res.status(404).json({
+        success: false,
+        message: "برنامه تمرینی مورد نظر یافت نشد",
+      });
+      return;
+    }
+
+    // پیدا کردن روز
+    let day = await Day.findOne({
+      day_workout_id: workout._id,
+      day_number: day_number,
+    });
+
+    // اگر روز وجود نداشت، ایجاد کن
+    if (!day) {
+      day = new Day({
+        day_number: day_number,
+        day_muscle_groups: [movement.movement_muscle_group],
+        day_workout_id: workout._id,
+        day_movements: [],
+        day_is_active: true,
+      });
+      await day.save();
+    }
+
+    // ایجاد حرکت جدید
+    const newMovement = new Movement({
+      ...parseMovementFields(movement),
+      movement_workout_id: workout._id,
+      movement_day_id: day._id,
+      movement_is_active: true,
+      movement_order: (day.day_movements?.length || 0) + 1,
+      movement_set_config: {
+        sets: movement.movement_sets,
+        reps: movement.movement_reps,
+        rest_time: movement.movement_rest_time,
+        rest_time_unit: "seconds",
+      },
+    });
+
+    const savedMovement = await newMovement.save();
+
+    // اضافه کردن حرکت به روز
+    day.day_movements.push(savedMovement._id as mongoose.Types.ObjectId);
+    await day.save();
+
+    // اگر گروه عضلانی حرکت در روز نبود، اضافه کن
+    if (!day.day_muscle_groups.includes(movement.movement_muscle_group)) {
+      day.day_muscle_groups.push(movement.movement_muscle_group);
+      await day.save();
+    }
+
+    // دریافت برنامه با اطلاعات آپدیت شده
+    const updatedWorkout = await Workout.findOne({
+      workout_id: workoutId,
+    }).populate({
+      path: "days",
+      populate: {
+        path: "day_movements",
+        model: "Movement",
+      },
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "حرکت با موفقیت به برنامه اضافه شد",
+      data: updatedWorkout,
+    });
+  } catch (error) {
+    console.error("Error adding movement:", error);
+    res.status(500).json({
+      success: false,
+      message: "خطا در اضافه کردن حرکت",
       error: error instanceof Error ? error.message : "خطای ناشناخته",
     });
   }

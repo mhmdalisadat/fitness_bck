@@ -10,6 +10,7 @@ export const MUSCLE_GROUPS = [
   "legs",
   "abs",
   "full_body",
+  "rest",
 ] as const;
 
 // سطح سختی
