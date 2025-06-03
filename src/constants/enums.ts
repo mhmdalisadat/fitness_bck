@@ -97,3 +97,40 @@ export const INJURIES = [
   "ankle",
   "none",
 ] as const;
+
+export type SetType =
+  | "straight" // Straight Set
+  | "superset" // Superset
+  | "triset" // Tri-Set
+  | "giant" // Giant Set
+  | "drop" // Drop Set
+  | "restPause" // Rest-Pause Set
+  | "pyramid" // Pyramid Set
+  | "fst7" // FST-7
+  | "cluster" // Cluster Sets
+  | "circuit" // Circuit Training
+  | "hiit" // HIIT
+  | "preExhaust" // Pre-Exhaust
+  | "postExhaust" // Post-Exhaust
+  | "tut" // Time Under Tension
+  | "powerbuilding" // Powerbuilding
+  | "mindMuscle"; // Mind-Muscle Connection
+
+export const SET_TYPES: SetType[] = [
+  "straight",
+  "superset",
+  "triset",
+  "giant",
+  "drop",
+  "restPause",
+  "pyramid",
+  "fst7",
+  "cluster",
+  "circuit",
+  "hiit",
+  "preExhaust",
+  "postExhaust",
+  "tut",
+  "powerbuilding",
+  "mindMuscle",
+];
