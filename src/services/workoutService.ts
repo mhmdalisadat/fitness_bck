@@ -66,6 +66,8 @@ export class WorkoutService {
       throw new Error("برنامه تمرینی مورد نظر یافت نشد");
     }
 
+    const user = workout.creator ? await User.findById(workout.creator) : null;
+
     if (isPatch) {
       Object.keys(data).forEach((key) => {
         if (
@@ -96,11 +98,11 @@ export class WorkoutService {
 
     await workout.save();
 
-    const user = data.user
+    const updatedUser = data.user
       ? await User.findOne({ phoneNumber: data.user.phoneNumber })
-      : null;
+      : user;
 
-    return this.getPopulatedWorkout(workout._id as Types.ObjectId, user);
+    return this.getPopulatedWorkout(workout._id as Types.ObjectId, updatedUser);
   }
 
   static async addMovement(
@@ -217,3 +219,4 @@ export class WorkoutService {
     };
   }
 }
+ 
