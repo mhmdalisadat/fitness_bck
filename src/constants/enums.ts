@@ -36,7 +36,7 @@ export const EQUIPMENT_TYPES = [
   "dip_bars",
 ] as const;
 
-// اهداف تمرینی
+
 export const TRAINING_GOALS = [
   "weight_loss",
   "muscle_gain",
