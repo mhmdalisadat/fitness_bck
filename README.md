@@ -96,3 +96,111 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+# Fitness Backend API
+
+یک API backend برای مدیریت تمرینات و کاربران با استفاده از NestJS و Drizzle ORM.
+
+## ویژگی‌ها
+
+- ✅ مدیریت کاربران
+- ✅ مدیریت تمرینات و دسته‌بندی‌ها
+- ✅ مدیریت روزهای تمرین
+- ✅ مدیریت حرکات ورزشی
+- ✅ پیگیری پیشرفت کاربران
+- ✅ Drizzle ORM برای دیتابیس PostgreSQL
+
+## نصب و راه‌اندازی
+
+### پیش‌نیازها
+
+- Node.js (v18 یا بالاتر)
+- PostgreSQL
+- pnpm
+
+### نصب dependencies
+
+```bash
+pnpm install
+```
+
+### تنظیم متغیرهای محیطی
+
+فایل `.env` را در ریشه پروژه ایجاد کنید:
+
+```env
+DATABASE_URL="postgresql://postgres:se.MASadat.3369@localhost:5432/fitness_db"
+NODE_ENV=development
+PORT=3000
+JWT_SECRET=your-super-secret-jwt-key
+JWT_EXPIRES_IN=7d
+```
+
+### راه‌اندازی دیتابیس
+
+```bash
+# ایجاد migration
+pnpm run db:generate
+
+# اعمال schema به دیتابیس
+pnpm run db:push
+```
+
+### اجرای اپلیکیشن
+
+```bash
+# Development mode
+pnpm run start:dev
+
+# Production mode
+pnpm run start:prod
+```
+
+## دستورات مفید
+
+```bash
+# تولید migration جدید
+pnpm run db:generate
+
+# اعمال migration
+pnpm run db:migrate
+
+# push کردن schema (development)
+pnpm run db:push
+
+# باز کردن Drizzle Studio
+pnpm run db:studio
+```
+
+## API Endpoints
+
+### کاربران
+
+- `GET /users` - دریافت تمام کاربران
+- `GET /users/:id` - دریافت کاربر بر اساس ID
+- `POST /users` - ایجاد کاربر جدید
+- `PUT /users/:id` - به‌روزرسانی کاربر
+- `DELETE /users/:id` - حذف کاربر
+
+## ساختار دیتابیس
+
+### جداول اصلی:
+
+- **users** - اطلاعات کاربران
+- **workout_categories** - دسته‌بندی‌های تمرین
+- **workouts** - تمرینات
+- **workout_days** - روزهای تمرین
+- **exercises** - حرکات ورزشی
+- **workout_day_exercises** - ارتباط روز تمرین و حرکات
+- **user_workout_progress** - پیشرفت کاربران
+
+## تکنولوژی‌های استفاده شده
+
+- **NestJS** - Framework اصلی
+- **Drizzle ORM** - ORM برای دیتابیس
+- **PostgreSQL** - دیتابیس
+- **TypeScript** - زبان برنامه‌نویسی
+
+## توسعه
+
+برای اطلاعات بیشتر درباره استفاده از Drizzle ORM، فایل `DRIZZLE_README.md` را مطالعه کنید.

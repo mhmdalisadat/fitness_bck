@@ -1,6 +1,4 @@
-// تعریف ثابت‌های مشترک بین مدل‌ها
 
-// گروه‌های عضلانی
 export const MUSCLE_GROUPS = [
   "chest",
   "back",
