@@ -1,4 +1,4 @@
-import { MUSCLE_GROUPS, DIFFICULTY_LEVELS, EQUIPMENT_TYPES, MOVEMENT_TYPES, SET_TYPES } from '../../constants/enums';
+import type { MUSCLE_GROUPS, DIFFICULTY_LEVELS, EQUIPMENT_TYPES, MOVEMENT_TYPES, SET_TYPES } from '../../constants/enums';
 
 export interface Movement {
   id: number;

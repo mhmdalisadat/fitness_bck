@@ -1,6 +1,6 @@
-import { TRAINING_EXPERIENCE_LEVELS, TRAINING_GOALS, MEDICAL_CONDITIONS, INJURIES } from '../constants/enums';
+import type { TRAINING_EXPERIENCE_LEVELS, TRAINING_GOALS, MEDICAL_CONDITIONS, INJURIES } from '../constants/enums';
 
-export interface User {
+export interface IUser {
   id: number;
   phoneNumber: string;
   name: string;
@@ -8,7 +8,7 @@ export interface User {
   height: number;
   weight: number;
   trainingExperience: (typeof TRAINING_EXPERIENCE_LEVELS)[number];
-  trainingGoals: (typeof TRAINING_GOALS)[number][];
+  trainingGoals: ("weight_loss" | "muscle_gain" | ...)[];
   medicalConditions: (typeof MEDICAL_CONDITIONS)[number][];
   injuries: (typeof INJURIES)[number][];
   isActive: boolean;
@@ -16,7 +16,7 @@ export interface User {
   updatedAt: Date;
 }
 
-export interface CreateUserInput {
+export interface ICreateUserInput {
   phoneNumber: string;
   name: string;
   age: number;
@@ -29,7 +29,7 @@ export interface CreateUserInput {
   isActive?: boolean;
 }
 
-export interface UpdateUserInput {
+export interface IUpdateUserInput {
   phoneNumber?: string;
   name?: string;
   age?: number;

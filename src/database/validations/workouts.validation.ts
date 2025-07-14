@@ -27,6 +27,6 @@ export const validateWorkoutData = (data: any) => {
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 }; 

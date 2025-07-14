@@ -1,6 +1,4 @@
-import { IUser } from "../models/user";
-import { IMovement } from "../models/movement";
-import {
+import type {
   TRAINING_EXPERIENCE_LEVELS,
   MUSCLE_GROUPS,
   MOVEMENT_TYPES,

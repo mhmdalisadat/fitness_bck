@@ -1,6 +1,5 @@
 import { pgTable, serial, text, timestamp, integer, boolean, varchar, json } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
-import { MUSCLE_GROUPS, DIFFICULTY_LEVELS, EQUIPMENT_TYPES, MOVEMENT_TYPES, SET_TYPES } from '../../constants/enums';
 import { workouts } from './workouts.schema';
 import { workoutDays } from './workout-days.schema';
 

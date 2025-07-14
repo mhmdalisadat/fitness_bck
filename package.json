@@ -53,6 +53,7 @@
     "eslint": "link:/eslint",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "link:/eslint-plugin-prettier",
+    "eslint-plugin-unused-imports": "^4.1.4",
     "globals": "^16.0.0",
     "jest": "^29.7.0",
     "js": "link:/@eslint/js",

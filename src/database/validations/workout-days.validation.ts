@@ -1,5 +1,6 @@
 import { MUSCLE_GROUPS } from '../../constants/enums';
 
+
 export const validateWorkoutDayData = (data: any) => {
   const errors: string[] = [];
 
@@ -37,6 +38,6 @@ export const validateWorkoutDayData = (data: any) => {
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 }; 

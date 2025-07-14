@@ -4,6 +4,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './schema';
 import { DatabaseService } from './database.service';
+import { IDrizzleDatabase } from './types';
 
 @Global()
 @Module({
@@ -11,9 +12,10 @@ import { DatabaseService } from './database.service';
   providers: [
     {
       provide: 'DATABASE',
-      useFactory: (configService: ConfigService) => {
+      useFactory: (configService: ConfigService): IDrizzleDatabase => {
         const connectionString = configService.get<string>('DATABASE_URL');
         const client = postgres(connectionString!);
+
         return drizzle(client, { schema });
       },
       inject: [ConfigService],

@@ -68,6 +68,6 @@ export const validateUserData = (data: any) => {
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };

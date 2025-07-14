@@ -95,7 +95,7 @@ export const INJURIES = [
   "none",
 ] as const;
 
-export type SetType =
+export type ISetType =
   | "straight"
   | "superset" 
   | "triset" 
@@ -113,7 +113,7 @@ export type SetType =
   | "powerbuilding" // Powerbuilding
   | "mindMuscle"; // Mind-Muscle Connection
 
-export const SET_TYPES: SetType[] = [
+export const SET_TYPES: ISetType[] = [
   "straight",
   "superset",
   "triset",

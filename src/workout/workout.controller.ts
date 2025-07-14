@@ -18,6 +18,7 @@ export class WorkoutController {
       programName,
       exercises,
     });
+
     return { message: 'Program created', program };
   }
 
@@ -27,6 +28,7 @@ export class WorkoutController {
     if (!programs || programs.length === 0) {
       throw new HttpException('No programs found for this user', HttpStatus.NOT_FOUND);
     }
+
     return programs;
   }
 }
