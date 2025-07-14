@@ -11,7 +11,7 @@ export const MUSCLE_GROUPS = [
   "rest",
 ] as const;
 
-// سطح سختی
+
 export const DIFFICULTY_LEVELS = [
   "beginner",
   "intermediate",
@@ -19,7 +19,7 @@ export const DIFFICULTY_LEVELS = [
   "professional",
 ] as const;
 
-// تجهیزات مورد نیاز
+
 export const EQUIPMENT_TYPES = [
   "none",
   "dumbbell",
@@ -44,7 +44,7 @@ export const TRAINING_GOALS = [
   "general_fitness",
 ] as const;
 
-// نوع حرکت
+
 export const MOVEMENT_TYPES = [
   "compound",
   "isolation",
@@ -53,7 +53,6 @@ export const MOVEMENT_TYPES = [
   "plyometric",
 ] as const;
 
-// روزهای هفته
 export const WEEK_DAYS = [
   "saturday",
   "sunday",
@@ -64,7 +63,7 @@ export const WEEK_DAYS = [
   "friday",
 ] as const;
 
-// زمان‌های تمرین
+
 export const TRAINING_TIMES = [
   "morning",
   "afternoon",
@@ -97,12 +96,12 @@ export const INJURIES = [
 ] as const;
 
 export type SetType =
-  | "straight" // Straight Set
-  | "superset" // Superset
-  | "triset" // Tri-Set
-  | "giant" // Giant Set
-  | "drop" // Drop Set
-  | "restPause" // Rest-Pause Set
+  | "straight"
+  | "superset" 
+  | "triset" 
+  | "giant" 
+  | "drop" 
+  | "restPause" 
   | "pyramid" // Pyramid Set
   | "fst7" // FST-7
   | "cluster" // Cluster Sets

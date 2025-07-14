@@ -1,4 +1,4 @@
-import { TRAINING_EXPERIENCE_LEVELS, TRAINING_GOALS, MEDICAL_CONDITIONS, INJURIES } from '../constants/enums';
+import { TRAINING_EXPERIENCE_LEVELS, TRAINING_GOALS, MEDICAL_CONDITIONS, INJURIES } from '../../constants/enums';
 
 export const validateUserData = (data: any) => {
   const errors: string[] = [];
