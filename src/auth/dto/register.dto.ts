@@ -40,4 +40,5 @@ export class RegisterDto {
 
   @IsArray()
   @IsOptional()
-  injuries?: (typeof INJURIES)[number][];}
+  injuries?: (typeof INJURIES)[number][];
+}

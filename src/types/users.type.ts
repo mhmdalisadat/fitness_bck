@@ -8,7 +8,7 @@ export interface IUser {
   height: number;
   weight: number;
   trainingExperience: (typeof TRAINING_EXPERIENCE_LEVELS)[number];
-  trainingGoals: ("weight_loss" | "muscle_gain" | ...)[];
+  trainingGoals: (typeof TRAINING_GOALS)[number][];
   medicalConditions: (typeof MEDICAL_CONDITIONS)[number][];
   injuries: (typeof INJURIES)[number][];
   isActive: boolean;
@@ -40,4 +40,19 @@ export interface IUpdateUserInput {
   medicalConditions?: (typeof MEDICAL_CONDITIONS)[number][];
   injuries?: (typeof INJURIES)[number][];
   isActive?: boolean;
+}
+
+export interface IUserFilters {
+  isActive?: boolean;
+  trainingExperience?: string;
+  ageMin?: number;
+  ageMax?: number;
+  search?: string;
+}
+
+export interface IPaginationOptions {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
