@@ -8,6 +8,13 @@
       "when": 1752425479936,
       "tag": "0000_flat_shadow_king",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1756570408247,
+      "tag": "0001_thin_apocalypse",
+      "breakpoints": true
     }
   ]
 }
